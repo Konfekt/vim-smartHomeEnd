@@ -13,7 +13,8 @@ silent! nmap <unique> <Home>                    <Plug>(SmartHomeEnd-Home)
 silent! nmap <unique> <End>                     <Plug>(SmartHomeEnd-End)
 silent! xmap <unique> <Home>                    <Plug>(SmartHomeEnd-Home)
 silent! xmap <unique> <End>                     <Plug>(SmartHomeEnd-End)
-silent! imap <unique> <Home>                    <Plug>(SmartHomeEnd-Home)
-silent! imap <unique> <End>                     <Plug>(SmartHomeEnd-End)
+silent! imap <unique> <C-A>  <Plug>(SmartHomeEnd-Home)
+        inoremap             <SID>(CtrlE) <C-E>
+silent! imap <unique><expr>  <C-E>        col('.')>strlen(getline('.'))\|\|pumvisible()?"<SID>(CtrlE)":"<Plug>(SmartHomeEnd-End)"
 
 let g:loaded_SmartHomeEnd = 1

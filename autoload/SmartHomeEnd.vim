@@ -48,6 +48,24 @@ function! SmartHomeEnd#End(mode) abort
     normal! m`gvg``
   endif
 
+  " Jump after last column if cursor on the last screen row of buffer line.
+  if a:mode ==# 'i'
+    let winid = bufwinid(bufname())
+    let line = line('.')
+    " Get the cursor's current screen row and column
+    let cursor_screenpos = screenpos(winid, line, col('.'))
+    let cursor_screenrow = cursor_screenpos.row
+
+    " Get the screen row of the end of the current line
+    let end_of_line_screenpos = screenpos(winid, line, col('$'))
+    let end_of_line_screenrow = end_of_line_screenpos.row
+
+    " Check if the cursor is on the same screen row as the end of the line
+    if cursor_screenrow == end_of_line_screenrow
+      return "\<right>"
+    endif
+  endif
+
   return ''
 endfunction
 
