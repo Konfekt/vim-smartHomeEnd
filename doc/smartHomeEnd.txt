@@ -1,0 +1,22 @@
+smartHomeEnd.txt
+
+================================================================================
+CONTENTS
+
+1. Vim-smartHomeEnd................................|smarthomeend-vim-smarthomeend|
+
+================================================================================
+VIM-SMARTHOMEEND                                   *smarthomeend*
+
+Vim plug-in makes the `<Home/End>` keys cycle through the starts/endings of
+the screen rows spanned by the current line in Normal and Visual Mode.
+In Insert Mode, the read-line bindings `<Ctrl-A/E>` are remapped instead.
+Suggested remappings:
+>
+    nmap H <Home>
+    xmap H <Home>
+    nmap L <End>
+    xmap L <End>
+<
+
+ vim:tw=78:ts=8:ft=help:norl:
