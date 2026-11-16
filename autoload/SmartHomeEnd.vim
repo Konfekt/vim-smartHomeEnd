@@ -1,27 +1,34 @@
-" See http://vim.wikia.com/wiki/SmartHome_and_SmartEnd_over_wrapped_lines
-function! SmartHomeEnd#Home(mode) abort
-  let curcol = col('.')
-  "gravitate towards beginning for wrapped lines
-  if curcol > indent('.') + 2
-    call cursor(0, curcol - 1)
-  endif
-  if curcol == 1 || curcol > indent('.') + 1
-    if &wrap
-      normal! g^
-    else
-      normal! ^
-    endif
-  else
-    if &wrap
-      normal! g0
-    else
-      normal! 0
-    endif
-  endif
+" Based on https://vim.fandom.com/wiki/SmartHome_and_SmartEnd_over_wrapped_lines
 
+" Run a screen-row motion if 'wrap' is set, else the buffer-line motion.
+function! s:Motion(wrapped, unwrapped) abort
+  execute 'normal!' (&wrap ? a:wrapped : a:unwrapped)
+endfunction
+
+" Restore the Visual selection with the cursor at its new position.
+function! s:Reselect(mode) abort
   if a:mode is# 'v'
     normal! m`gvg``
   endif
+endfunction
+
+function! SmartHomeEnd#Home(mode) abort
+  let curcol = col('.')
+  " Byte column of the first non-blank character.
+  let firstcol = matchend(getline('.'), '^\s*') + 1
+
+  " Gravitate towards the beginning for wrapped lines.
+  if curcol > firstcol + 1
+    call cursor(0, curcol - 1)
+  endif
+
+  if curcol == 1 || curcol > firstcol
+    call s:Motion('g^', '^')
+  else
+    call s:Motion('g0', '0')
+  endif
+
+  call s:Reselect(a:mode)
   return ''
 endfunction
 
@@ -29,43 +36,28 @@ function! SmartHomeEnd#End(mode) abort
   let curcol = col('.')
   let lastcol = a:mode ==# 'i' ? col('$') : col('$') - 1
 
-  " Gravitate towards ending for wrapped lines
+  " Gravitate towards the end for wrapped lines.
   if curcol < lastcol - 1
     call cursor(0, curcol + 1)
   endif
 
   if curcol < lastcol
-    if &wrap
-      normal! g$
-    else
-      normal! $
-    endif
+    call s:Motion('g$', '$')
   else
     normal! g_
   endif
 
-  if a:mode is# 'v'
-    normal! m`gvg``
-  endif
+  call s:Reselect(a:mode)
 
-  " Jump after last column if cursor on the last screen row of buffer line.
+  " In Insert mode, move past the last character if the cursor is on the
+  " last screen row of the buffer line.
   if a:mode ==# 'i'
-    let winid = bufwinid(bufname())
-    let line = line('.')
-    " Get the cursor's current screen row and column
-    let cursor_screenpos = screenpos(winid, line, col('.'))
-    let cursor_screenrow = cursor_screenpos.row
-
-    " Get the screen row of the end of the current line
-    let end_of_line_screenpos = screenpos(winid, line, col('$'))
-    let end_of_line_screenrow = end_of_line_screenpos.row
-
-    " Check if the cursor is on the same screen row as the end of the line
-    if cursor_screenrow == end_of_line_screenrow
-      return "\<right>"
+    let winid = win_getid()
+    let lnum = line('.')
+    if screenpos(winid, lnum, col('.')).row == screenpos(winid, lnum, col('$')).row
+      return "\<Right>"
     endif
   endif
 
   return ''
 endfunction
-
