@@ -1,3 +1,4 @@
+scriptencoding utf-8
 " Headless tests for vim-smartHomeEnd.
 " Run with test/run.sh, or:
 "   vim -N -u NONE -i NONE --not-a-term -S test/test.vim
@@ -126,8 +127,36 @@ function! s:TestVisual() abort
   call s:Check('visual end: end', getpos("'>")[2], 11)
 endfunction
 
+" Multibyte characters: repeated <End> and <Home> move through the screen
+" rows of a wrapped line instead of sticking at the end of the first one.
+function! s:TestMultibyteWrapped() abort
+  call s:Reset([repeat('é', 200)])
+  call cursor(1, 1)
+  call feedkeys("\<End>", 'xt')
+  call s:Check('multibyte end: end of first screen row', virtcol('.'), 80)
+  call feedkeys("\<End>", 'xt')
+  call s:Check('multibyte end: end of second screen row', virtcol('.'), 160)
+  call feedkeys("\<End>", 'xt')
+  call s:Check('multibyte end: end of line', virtcol('.'), 200)
+  call feedkeys("\<Home>", 'xt')
+  call s:Check('multibyte home: start of last screen row', virtcol('.'), 161)
+  call feedkeys("\<Home>", 'xt')
+  call s:Check('multibyte home: start of second screen row', virtcol('.'), 81)
+endfunction
+
+" Visual mode does not overwrite the previous context mark ''.
+function! s:TestVisualKeepsMark() abort
+  call s:Reset(['    foo bar', 'x', 'y'])
+  normal! G
+  normal! gg
+  call cursor(1, 9)
+  call feedkeys("v\<Home>\<Esc>v\<End>\<Esc>", 'xt')
+  call s:Check("visual: '' mark kept", getpos("''")[1:2], [3, 1])
+endfunction
+
 for s:t in ['HomeSpaces', 'HomeTabs', 'End', 'InsertEndWrapped',
-      \ 'InsertEndSplit', 'InsertEndSpecialName', 'CtrlEFallback', 'Visual']
+      \ 'InsertEndSplit', 'InsertEndSpecialName', 'CtrlEFallback', 'Visual',
+      \ 'MultibyteWrapped', 'VisualKeepsMark']
   try
     call call('s:Test' . s:t, [])
   catch
