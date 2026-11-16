@@ -8,8 +8,8 @@ set cpoptions&vim
 
 nnoremap <silent> <Plug>(SmartHomeEnd-Home) :<C-u>call SmartHomeEnd#Home('n')<CR>
 nnoremap <silent> <Plug>(SmartHomeEnd-End)  :<C-u>call SmartHomeEnd#End('n')<CR>
-xnoremap <silent> <Plug>(SmartHomeEnd-Home) <Esc>:call SmartHomeEnd#Home('v')<CR>
-xnoremap <silent> <Plug>(SmartHomeEnd-End)  <Esc>:call SmartHomeEnd#End('v')<CR>
+xnoremap <silent> <Plug>(SmartHomeEnd-Home) :<C-u>call SmartHomeEnd#Home('v')<CR>
+xnoremap <silent> <Plug>(SmartHomeEnd-End)  :<C-u>call SmartHomeEnd#End('v')<CR>
 inoremap <silent> <Plug>(SmartHomeEnd-Home) <C-r>=SmartHomeEnd#Home('i')<CR>
 inoremap <silent> <Plug>(SmartHomeEnd-End)  <C-r>=SmartHomeEnd#End('i')<CR>
 
